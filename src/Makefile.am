@@ -171,6 +171,31 @@ libgabble_convenience_la_SOURCES += \
     gtalk-file-collection.h
 endif
 
+if ENABLE_OTR
+libgabble_convenience_la_SOURCES += \
+    im-channel-otr.c \
+    im-channel-otr.h \
+    _gdbus/Channel_Interface_OTR1.c \
+    _gdbus/Channel_Interface_OTR1.h \
+    $(NULL)
+
+BUILT_SOURCES += \
+    _gdbus/Channel_Interface_OTR1.c \
+    _gdbus/Channel_Interface_OTR1.h
+endif
+
+_gdbus/%.c: _gdbus/%-stamp
+	@:
+_gdbus/%.h: _gdbus/%-stamp
+	@:
+_gdbus/%-stamp: Makefile %.xml
+	$(MKDIR_P) _gdbus
+	gdbus-codegen --interface-prefix im.telepathy.v1. \
+	              --generate-c-code _gdbus/$* \
+	              --c-namespace GabbleGDBus \
+	              $*.xml
+	touch $@
+
 enumtype_sources = \
     $(top_srcdir)/src/connection.h \
     $(top_srcdir)/src/room-config.h \
@@ -231,6 +256,7 @@ AM_CFLAGS = $(ERROR_CFLAGS) -I$(top_srcdir) -I$(top_builddir) \
 	    @DBUS_CFLAGS@ @GLIB_CFLAGS@ @WOCKY_CFLAGS@ \
 	    @TP_GLIB_CFLAGS@ \
 	    @SOUP_CFLAGS@ @NICE_CFLAGS@ @GMODULE_CFLAGS@ \
+	    @OTR_CFLAGS@ @LIBGCRYPT_CFLAGS@ \
 	    -I $(top_srcdir)/lib -I $(top_builddir)/lib \
 	    -DG_LOG_DOMAIN=\"gabble\" \
 	    -DPLUGIN_DIR=\"$(pluginexecdir)\"
@@ -241,7 +267,7 @@ if WINDOWS
 endif
 
 ALL_LIBS =  @DBUS_LIBS@ @GLIB_LIBS@ @WOCKY_LIBS@ @TP_GLIB_LIBS@ \
-	    @SOUP_LIBS@ @NICE_LIBS@ @GMODULE_LIBS@
+	    @SOUP_LIBS@ @NICE_LIBS@ @GMODULE_LIBS@ @OTR_LIBS@ @LIBGCRYPT_LIBS@
 
 # build gibber first
 all: gibber

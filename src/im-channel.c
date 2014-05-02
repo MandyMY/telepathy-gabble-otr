@@ -39,6 +39,10 @@
 #include "roster.h"
 #include "util.h"
 
+#ifdef ENABLE_OTR
+#include "im-channel-otr.h"
+#endif
+
 static void destroyable_iface_init (gpointer, gpointer);
 
 G_DEFINE_TYPE_WITH_CODE (GabbleIMChannel, gabble_im_channel,
@@ -157,6 +161,10 @@ gabble_im_channel_constructed (GObject *obj)
   priv->chat_states_supported = CHAT_STATES_UNKNOWN;
   tp_message_mixin_implement_send_chat_state (obj,
       _gabble_im_channel_send_chat_state);
+
+#ifdef ENABLE_OTR
+  gabble_im_channel_otr_init (self);
+#endif
 }
 
 static void gabble_im_channel_dispose (GObject *object);
@@ -390,6 +398,16 @@ _gabble_im_channel_send_message (GObject *object,
           flags = 0;
         }
 
+#ifdef ENABLE_OTR
+      if (!gabble_im_channel_otr_sending (self, stanza, &error))
+        {
+          tp_message_mixin_sent (object, message, 0, NULL, error);
+          g_clear_error (&error);
+          g_object_unref (stanza);
+          return;
+        }
+#endif
+
       porter = gabble_connection_dup_porter (gabble_conn);
       context = g_slice_new0 (_GabbleIMSendMessageCtx);
       context->channel = g_object_ref (base);
@@ -406,7 +424,6 @@ _gabble_im_channel_send_message (GObject *object,
       tp_message_mixin_sent (object, message, 0, NULL, error);
       g_error_free (error);
     }
-
 
   if (priv->send_nick)
     priv->send_nick = FALSE;
@@ -502,11 +519,19 @@ _gabble_im_channel_receive (GabbleIMChannel *chan,
   TpBaseChannel *base_chan;
   TpHandle peer;
   TpMessage *msg;
+  gchar *text_dup = NULL;
 
   g_assert (GABBLE_IS_IM_CHANNEL (chan));
   priv = chan->priv;
   base_chan = (TpBaseChannel *) chan;
   peer = tp_base_channel_get_target_handle (base_chan);
+
+#ifdef ENABLE_OTR
+  /* If it returns NULL it means that was an internal OTR protocol message */
+  text = text_dup = gabble_im_channel_otr_receiving (chan, text);
+  if (text == NULL)
+    return;
+#endif
 
   /* update peer's full JID if it's changed */
   if (tp_strdiff (from, priv->peer_jid))
@@ -529,6 +554,8 @@ _gabble_im_channel_receive (GabbleIMChannel *chan,
 
   tp_message_mixin_take_received (G_OBJECT (chan), msg);
   maybe_send_delivery_report (chan, message, from, id);
+
+  g_free (text_dup);
 }
 
 void

@@ -222,6 +222,17 @@ PKG_CHECK_MODULES(GMODULE, [gmodule-2.0 >= 2.32])
 AC_DEFINE(GLIB_VERSION_MIN_REQUIRED, GLIB_VERSION_2_32, [Ignore post 2.32 deprecations])
 AC_DEFINE(GLIB_VERSION_MAX_ALLOWED, GLIB_VERSION_2_32, [Prevent post 2.32 APIs])
 
+dnl Check for GIO-Unix
+PKG_CHECK_MODULES(GIO_UNIX, [gio-unix-2.0],
+  have_gio_unix=yes, have_gio_unix=no)
+
+AS_IF([test "x$have_gio_unix" = "xyes"],
+  [AC_DEFINE(HAVE_GIO_UNIX, [], [Define if GIO-Unix is available])
+
+  GLIB_CFLAGS="$GLIB_CFLAGS $GIO_UNIX_CFLAGS"
+  GLIB_LIBS="$GLIB_LIBS $GIO_UNIX_LIBS"
+  ])
+
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
@@ -408,6 +419,22 @@ AC_SUBST(NICE_CFLAGS)
 AC_SUBST(NICE_LIBS)
 AM_CONDITIONAL([ENABLE_JINGLE_FILE_TRANSFER], [test "x$enable_jingle_ft" = xyes])
 
+AC_ARG_ENABLE(otr,
+  AC_HELP_STRING([--disable-otr],
+                 [disable OTR support]),
+    [enable_otr=$enableval], [enable_otr=yes])
+
+if test x$enable_otr = xyes; then
+    PKG_CHECK_MODULES(OTR, libotr >= 4.0.0)
+    AM_PATH_LIBGCRYPT(1:1.2.0,,AC_MSG_ERROR(libgcrypt 1.2.0 or newer is required.))
+    AC_DEFINE(ENABLE_OTR, [], [Enable OTR])
+fi
+AM_CONDITIONAL([ENABLE_OTR], [test "x$enable_otr" = xyes])
+
+AC_SUBST(OTR_CFLAGS)
+AC_SUBST(OTR_LIBS)
+AM_CONDITIONAL([ENABLE_OTR], [test "x$enable_otr" = xyes])
+
 AC_CHECK_FUNCS(getifaddrs memset select strndup setresuid setreuid strerror)
 
 AC_OUTPUT( Makefile \
@@ -454,5 +481,5 @@ Configure summary:
         File transfer support.......:  ${enable_ft}
         Jingle file transfer support:  ${enable_jingle_ft}
         VoIP support................:  ${enable_voip}
-
+        OTR support.................:  ${enable_otr}
 "

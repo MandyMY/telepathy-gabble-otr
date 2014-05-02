@@ -22,6 +22,7 @@ FIXME.out
 Makefile
 Makefile.in
 _gen
+_gdbus
 /aclocal.m4
 /autom4te.cache
 /build-aux
