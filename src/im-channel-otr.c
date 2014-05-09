@@ -346,25 +346,28 @@ otr_error_message (void *opdata,
 {
   gchar *err_msg = NULL;
 
+  /* Those messages are sent to the other end. We can't translate them since
+   * we don't know if the other end speaks the same language as user's current
+   * locale. So that's "international English". */
   switch (err_code)
     {
       case OTRL_ERRCODE_NONE:
         break;
       case OTRL_ERRCODE_ENCRYPTION_ERROR:
-        err_msg = g_strdup(_("Error occurred encrypting message."));
+        err_msg = g_strdup ("Error occurred encrypting message.");
         break;
       case OTRL_ERRCODE_MSG_NOT_IN_PRIVATE:
         if (context)
           {
-            err_msg = g_strdup_printf (_("You sent encrypted data to %s, who"
-                " wasn't expecting it."), context->accountname);
+            err_msg = g_strdup_printf ("You sent encrypted data to %s, who"
+                " wasn't expecting it.", context->accountname);
           }
         break;
       case OTRL_ERRCODE_MSG_UNREADABLE:
-        err_msg = g_strdup (_("You transmitted an unreadable encrypted message."));
+        err_msg = g_strdup ("You transmitted an unreadable encrypted message.");
         break;
       case OTRL_ERRCODE_MSG_MALFORMED:
-        err_msg = g_strdup (_("You transmitted a malformed data message."));
+        err_msg = g_strdup ("You transmitted a malformed data message.");
         break;
     }
 
@@ -382,7 +385,7 @@ static const gchar *
 otr_resent_msg_prefix (void *opdata,
     ConnContext *context)
 {
-  return g_strdup (_("[resent]"));
+  return g_strdup ("[resent]");
 }
 
 static void
@@ -418,20 +421,20 @@ otr_handle_msg_event (void *opdata,
         break;
 
       case OTRL_MSGEVENT_ENCRYPTION_REQUIRED:
-        notify (self, _("Unencrypted messages to this recipient are not "
+        notify (self, "Unencrypted messages to this recipient are not "
             "allowed. Attempting to start a private conversation.\n\nYour "
             "message will be retransmitted when the private conversation "
-            "starts."));
+            "starts.");
         break;
 
       case OTRL_MSGEVENT_ENCRYPTION_ERROR:
-        notify (self, _("An error occurred when encrypting your message and "
-            "not sent."));
+        notify (self, "An error occurred when encrypting your message and "
+            "not sent.");
         break;
 
       case OTRL_MSGEVENT_CONNECTION_ENDED:
-        notify (self, _("Your message was not sent because %s closed their "
-            "connection. Either close your private connection, or refresh it."),
+        notify (self, "Your message was not sent because %s closed their "
+            "connection. Either close your private connection, or refresh it.",
             context->username);
         break;
 
@@ -442,40 +445,40 @@ otr_handle_msg_event (void *opdata,
         switch (gcry_err_code (err))
           {
             case GPG_ERR_INV_VALUE:
-              notify (self, _("Error setting up private conversation: "
-                  "Malformed message received"));
+              notify (self, "Error setting up private conversation: "
+                  "Malformed message received");
               break;
             default:
-              notify (self, _("Error setting up private conversation: %s"),
+              notify (self, "Error setting up private conversation: %s",
                   gcry_strerror (err));
               break;
           }
         break;
 
       case OTRL_MSGEVENT_MSG_REFLECTED:
-        notify (self, _("You are either trying to talk to yourself, "
+        notify (self, "You are either trying to talk to yourself, "
                 "or someone is reflecting your messages back "
-                "at you."));
+                "at you.");
         break;
 
       case OTRL_MSGEVENT_MSG_RESENT:
-        notify (self, _("The last message to %s was resent."),
+        notify (self, "The last message to %s was resent.",
             context->username);
         break;
 
       case OTRL_MSGEVENT_RCVDMSG_NOT_IN_PRIVATE:
-        notify (self, _("The encrypted message received from %s is unreadable, "
-            "as you are not currently communicating privately."),
+        notify (self, "The encrypted message received from %s is unreadable, "
+            "as you are not currently communicating privately.",
             context->username);
         break;
 
       case OTRL_MSGEVENT_RCVDMSG_UNREADABLE:
-        notify (self, _("We received an unreadable encrypted message from %s."),
+        notify (self, "We received an unreadable encrypted message from %s.",
             context->username);
         break;
 
       case OTRL_MSGEVENT_RCVDMSG_MALFORMED:
-        notify (self, _("We received a malformed data message from %s."),
+        notify (self, "We received a malformed data message from %s.",
             context->username);
         break;
 
@@ -488,12 +491,12 @@ otr_handle_msg_event (void *opdata,
         break;
 
       case OTRL_MSGEVENT_RCVDMSG_GENERAL_ERR:
-        notify (self, _("OTR Error: %s"), message);
+        notify (self, "OTR Error: %s", message);
         break;
 
       case OTRL_MSGEVENT_RCVDMSG_UNENCRYPTED:
-        notify (self, _("The following message received from %s was *not* "
-            "encrypted: %s"), context->username, message);
+        notify (self, "The following message received from %s was *not* "
+            "encrypted: %s", context->username, message);
         break;
 
       case OTRL_MSGEVENT_RCVDMSG_UNRECOGNIZED:
@@ -504,9 +507,9 @@ otr_handle_msg_event (void *opdata,
         if (priv->last_msg_event == msg_event)
           break;
 
-        notify (self, _("%s has sent a message intended for a different "
+        notify (self, "%s has sent a message intended for a different "
             "session. If you are logged in multiple times, another session may "
-            "have received the message."), context->username);
+            "have received the message.", context->username);
         break;
     }
 
