@@ -26,8 +26,12 @@
                 value="true"/>
 
     <tp:docstring xmlns="http://www.w3.org/1999/xhtml">
-      A simple D-Bus API <a
-        href="https://otr.cypherpunks.ca/">Off The Record</a>.
+      <p>A simple D-Bus API <a
+        href="https://otr.cypherpunks.ca/">Off The Record.</a>.</p>
+      <p>In telepathy 0.x this interface must be implemented on a special bus
+      name composed using the Connection bus name with ".OTR" suffix. The object
+      path is the same as channel's. That special trick will go away in
+      telepathy1.0</p>
     </tp:docstring>
 
     <property name="TrustLevel"
@@ -99,6 +103,37 @@
       </tp:docstring>
     </method>
 
+    <tp:enum name="Trust_Level" type="u">
+      <tp:docstring>
+        <p>Enumeration describing trust level of this conversation. The trust
+        level can only increase unless Initialize/Stop are called or
+        TrustFingerprint with trust=false</p>
+      </tp:docstring>
+      <tp:enumvalue suffix="NotPrivate" value="0">
+        <tp:docstring>
+          <p>The conversation is currently unencrypted</p>
+        </tp:docstring>
+      </tp:enumvalue>
+      <tp:enumvalue suffix="Unverified" value="1">
+        <tp:docstring>
+          <p>The conversation is currently encrypted but the remote end is not
+          verified</p>
+        </tp:docstring>
+      </tp:enumvalue>
+      <tp:enumvalue suffix="Private" value="2">
+        <tp:docstring>
+          <p>The conversation is currently encrypted and the remote end is
+          verified</p>
+        </tp:docstring>
+      </tp:enumvalue>
+      <tp:enumvalue suffix="Finished" value="3">
+        <tp:docstring>
+          <p>Remote end closed the OTR session, messages cannot be sent anymore.
+          Either call Stop to continue unencrypted or Initialize to send
+          encrypted messages again.</p>
+        </tp:docstring>
+      </tp:enumvalue>
+    </tp:enum>
   </interface>
 </node>
 <!-- vim:set sw=2 sts=2 et ft=xml: -->
