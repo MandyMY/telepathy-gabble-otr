@@ -33,6 +33,7 @@
 #include "presence-cache.h"
 #include "util.h"
 
+#define FINGERPRINT_LEN 20
 #define OTR_PRIV_KEY "otr-priv"
 #define GET_PRIV(self) g_object_get_data (G_OBJECT (self), OTR_PRIV_KEY)
 
@@ -176,8 +177,8 @@ fp_raw_to_variant (guchar *fp_raw)
 
       otrl_privkey_hash_to_human (display_fp, fp_raw);
       return g_variant_new ("(s@ay)", display_fp,
-          g_variant_new_fixed_array (G_VARIANT_TYPE_BYTE, fp_raw, 20,
-              sizeof (guchar)));
+          g_variant_new_fixed_array (G_VARIANT_TYPE_BYTE, fp_raw,
+              FINGERPRINT_LEN, sizeof (guchar)));
     }
 
   return g_variant_new ("(say)", "", NULL);
@@ -196,7 +197,7 @@ update_properties (GabbleIMChannel *self)
   ConnContext *context;
   TrustLevel level = TRUST_LEVEL_NOT_PRIVATE;
   Fingerprint *their_fp = NULL;
-  guchar our_fp_raw[20];
+  guchar our_fp_raw[FINGERPRINT_LEN];
 
   context = otrl_context_find (userstate, get_target_id (self),
       get_self_id (self), "xmpp", priv->instag, 0, NULL, NULL, NULL);
@@ -295,7 +296,7 @@ otr_new_fingerprint (void *opdata,
     const gchar *accountname,
     const gchar *protocol,
     const gchar *username,
-    guchar fingerprint[20])
+    guchar fingerprint[FINGERPRINT_LEN])
 {
   update_properties (opdata);
 }
