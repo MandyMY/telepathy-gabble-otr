@@ -30,8 +30,8 @@ gboolean gabble_im_channel_otr_sending (GabbleIMChannel *self,
     WockyStanza *stanza,
     GError **error);
 
-gchar *gabble_im_channel_otr_receiving (GabbleIMChannel *self,
-    const gchar *content);
+gboolean gabble_im_channel_otr_receiving (GabbleIMChannel *self,
+    TpMessage *message);
 
 G_END_DECLS
 

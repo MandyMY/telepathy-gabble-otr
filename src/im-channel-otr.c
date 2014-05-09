@@ -780,27 +780,43 @@ gabble_im_channel_otr_sending (GabbleIMChannel *self,
   return TRUE;
 }
 
-gchar *
+gboolean
 gabble_im_channel_otr_receiving (GabbleIMChannel *self,
-    const gchar *content)
+    TpMessage *message)
 {
+  ConnContext *context;
   OtrlTLV *tlvs = NULL;
+  gchar *content;
   gchar *new_content;
-  gchar *ret = NULL;
   gboolean ignore;
 
+  content = tp_message_to_text (message, NULL);
   ignore = otrl_message_receiving (userstate, ui_ops_p, self,
       get_self_id (self), "xmpp", get_target_id (self), content,
-      &new_content, &tlvs, NULL, NULL, NULL);
+      &new_content, &tlvs, &context, NULL, NULL);
+  g_free (content);
 
   if (otrl_tlv_find (tlvs, OTRL_TLV_DISCONNECTED) != NULL)
     update_properties (self);
   otrl_tlv_free(tlvs);
 
   if (!ignore)
-    ret = g_strdup ((new_content != NULL) ? new_content : content);
+    {
+      if (new_content != NULL)
+        tp_message_set_string (message, 1, "content", new_content);
+
+      if (context->active_fingerprint != NULL)
+        {
+          gchar display_fp[OTRL_PRIVKEY_FPRINT_HUMAN_LEN];
+
+          otrl_privkey_hash_to_human (display_fp,
+              context->active_fingerprint->fingerprint);
+          tp_message_set_string (message, 0, "otr-sender-fingerprint",
+              display_fp);
+        }
+    }
 
   otrl_message_free (new_content);
 
-  return ret;
+  return ignore;
 }

@@ -519,18 +519,26 @@ _gabble_im_channel_receive (GabbleIMChannel *chan,
   TpBaseChannel *base_chan;
   TpHandle peer;
   TpMessage *msg;
-  gchar *text_dup = NULL;
 
   g_assert (GABBLE_IS_IM_CHANNEL (chan));
   priv = chan->priv;
   base_chan = (TpBaseChannel *) chan;
   peer = tp_base_channel_get_target_handle (base_chan);
 
+  msg = build_message (chan, type, timestamp, text);
+  tp_cm_message_set_sender (msg, peer);
+  tp_message_set_int64 (msg, 0, "message-received", time (NULL));
+
+  if (id != NULL)
+    tp_message_set_string (msg, 0, "message-token", id);
+
 #ifdef ENABLE_OTR
-  /* If it returns NULL it means that was an internal OTR protocol message */
-  text = text_dup = gabble_im_channel_otr_receiving (chan, text);
-  if (text == NULL)
-    return;
+  /* If it returns FALSE it means that was an internal OTR protocol message */
+  if (gabble_im_channel_otr_receiving (chan, msg))
+    {
+      g_object_unref (msg);
+      return;
+    }
 #endif
 
   /* update peer's full JID if it's changed */
@@ -545,17 +553,8 @@ _gabble_im_channel_receive (GabbleIMChannel *chan,
   else
     _gabble_im_channel_state_receive (chan, state);
 
-  msg = build_message (chan, type, timestamp, text);
-  tp_cm_message_set_sender (msg, peer);
-  tp_message_set_int64 (msg, 0, "message-received", time (NULL));
-
-  if (id != NULL)
-    tp_message_set_string (msg, 0, "message-token", id);
-
   tp_message_mixin_take_received (G_OBJECT (chan), msg);
   maybe_send_delivery_report (chan, message, from, id);
-
-  g_free (text_dup);
 }
 
 void
