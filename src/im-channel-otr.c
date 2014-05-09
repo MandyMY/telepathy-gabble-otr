@@ -617,7 +617,7 @@ handle_initialize_cb (GabbleGDBusChannelInterfaceOTR1 *skeleton,
 {
   gchar *msg;
 
-  msg = otrl_proto_default_query_msg (get_self_id (self), OTRL_POLICY_DEFAULT);
+  msg = otrl_proto_default_query_msg (get_self_id (self), OTRL_POLICY_MANUAL);
   inject_message (self, msg);
   free (msg);
 
