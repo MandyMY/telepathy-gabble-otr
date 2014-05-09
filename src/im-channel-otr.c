@@ -743,6 +743,15 @@ gabble_im_channel_otr_init (GabbleIMChannel *self)
   g_object_unref (dbus);
 }
 
+void
+gabble_im_channel_otr_close (GabbleIMChannel *self)
+{
+  OtrPrivate *priv = GET_PRIV (self);
+
+  otrl_message_disconnect (userstate, ui_ops_p, self, get_self_id (self),
+      "xmpp", get_target_id (self), priv->instag);
+}
+
 gboolean
 gabble_im_channel_otr_sending (GabbleIMChannel *self,
     WockyStanza *stanza,

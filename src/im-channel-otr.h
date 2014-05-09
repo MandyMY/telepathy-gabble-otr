@@ -24,6 +24,7 @@
 G_BEGIN_DECLS
 
 void gabble_im_channel_otr_init (GabbleIMChannel *self);
+void gabble_im_channel_otr_close (GabbleIMChannel *self);
 
 gboolean gabble_im_channel_otr_sending (GabbleIMChannel *self,
     WockyStanza *stanza,

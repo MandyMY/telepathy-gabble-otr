@@ -665,6 +665,10 @@ gabble_im_channel_close (TpBaseChannel *base_chan)
 {
   GabbleIMChannel *self = GABBLE_IM_CHANNEL (base_chan);
 
+#ifdef ENABLE_OTR
+  gabble_im_channel_otr_close (self);
+#endif
+
   tp_message_mixin_maybe_send_gone ((GObject *) self);
 
   /* The IM factory will resurrect the channel if we have pending
