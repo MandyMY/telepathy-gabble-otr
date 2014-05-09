@@ -78,31 +78,21 @@ dup_fingerprint_filename (void)
 }
 
 static const gchar *
-get_id (TpBaseConnection *base_conn,
-    TpHandle contact)
-{
-  TpHandleRepoIface *contact_repo = tp_base_connection_get_handles (base_conn,
-      TP_HANDLE_TYPE_CONTACT);
-
-  return tp_handle_inspect (contact_repo, contact);
-}
-
-static const gchar *
 get_self_id (GabbleIMChannel *self)
 {
   TpBaseChannel *base_chan = (TpBaseChannel *) self;
   TpBaseConnection *base_conn = tp_base_channel_get_connection (base_chan);
+  TpHandleRepoIface *contact_repo = tp_base_connection_get_handles (base_conn,
+      TP_HANDLE_TYPE_CONTACT);
 
-  return get_id (base_conn, tp_base_connection_get_self_handle (base_conn));
+  return tp_handle_inspect (contact_repo,
+      tp_base_connection_get_self_handle (base_conn));
 }
 
 static const gchar *
 get_target_id (GabbleIMChannel *self)
 {
-  TpBaseChannel *base_chan = (TpBaseChannel *) self;
-  TpBaseConnection *base_conn = tp_base_channel_get_connection (base_chan);
-
-  return get_id (base_conn, tp_base_channel_get_target_handle (base_chan));
+  return _gabble_im_channel_get_peer_jid (self);
 }
 
 static void

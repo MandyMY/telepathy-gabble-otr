@@ -86,6 +86,8 @@ void _gabble_im_channel_report_delivery (
     TpChannelTextSendError send_error,
     TpDeliveryStatus delivery_status);
 
+const gchar *_gabble_im_channel_get_peer_jid (GabbleIMChannel *chan);
+
 G_END_DECLS
 
 #endif /* #ifndef __GABBLE_IM_CHANNEL_H__*/

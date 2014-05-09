@@ -738,3 +738,11 @@ destroyable_iface_init (gpointer g_iface,
   IMPLEMENT(destroy);
 #undef IMPLEMENT
 }
+
+const gchar *
+_gabble_im_channel_get_peer_jid (GabbleIMChannel *chan)
+{
+  GabbleIMChannelPrivate *priv = chan->priv;
+
+  return priv->peer_jid;
+}
