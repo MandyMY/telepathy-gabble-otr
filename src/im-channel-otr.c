@@ -794,13 +794,18 @@ gchar *
 gabble_im_channel_otr_receiving (GabbleIMChannel *self,
     const gchar *content)
 {
+  OtrlTLV *tlvs = NULL;
   gchar *new_content;
   gchar *ret = NULL;
   gboolean ignore;
 
   ignore = otrl_message_receiving (userstate, ui_ops_p, self,
       get_self_id (self), "xmpp", get_target_id (self), content,
-      &new_content, NULL, NULL, NULL, NULL);
+      &new_content, &tlvs, NULL, NULL, NULL);
+
+  if (otrl_tlv_find (tlvs, OTRL_TLV_DISCONNECTED) != NULL)
+    update_properties (self);
+  otrl_tlv_free(tlvs);
 
   if (!ignore)
     ret = g_strdup ((new_content != NULL) ? new_content : content);
