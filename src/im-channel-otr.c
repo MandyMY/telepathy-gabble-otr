@@ -392,16 +392,6 @@ otr_resent_msg_prefix_free (void *opdata,
 }
 
 static void
-otr_handle_smp_event (void *opdata,
-    OtrlSMPEvent smp_event,
-    ConnContext *context,
-    unsigned short progress_percent,
-    gchar *question)
-{
-  DEBUG ("UNIMPLEMENTED\n");
-}
-
-static void
 otr_handle_msg_event (void *opdata,
     OtrlMessageEvent msg_event,
     ConnContext *context,
@@ -569,7 +559,7 @@ static OtrlMessageAppOps ui_ops =
   otr_error_message_free,
   otr_resent_msg_prefix,
   otr_resent_msg_prefix_free,
-  otr_handle_smp_event,
+  NULL, /* handle_smp_event */
   otr_handle_msg_event,
   otr_create_instag,
   NULL,      /* convert_data */
