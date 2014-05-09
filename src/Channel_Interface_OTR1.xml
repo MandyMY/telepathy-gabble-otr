@@ -92,6 +92,13 @@
       </tp:docstring>
     </method>
 
+    <method name="Stop"
+      tp:name-for-bindings="Stop">
+      <tp:docstring>
+        <p>Stops the OTR session.</p>
+      </tp:docstring>
+    </method>
+
   </interface>
 </node>
 <!-- vim:set sw=2 sts=2 et ft=xml: -->

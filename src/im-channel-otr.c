@@ -625,6 +625,22 @@ handle_initialize_cb (GabbleGDBusChannelInterfaceOTR1 *skeleton,
 }
 
 static gboolean
+handle_stop_cb (GabbleGDBusChannelInterfaceOTR1 *skeleton,
+    GDBusMethodInvocation *invocation,
+    GabbleIMChannel *self)
+{
+  OtrPrivate *priv = GET_PRIV (self);
+
+  otrl_message_disconnect (userstate, ui_ops_p, self, get_self_id (self),
+      "xmpp", get_target_id (self), priv->instag);
+
+  gabble_gdbus_channel_interface_otr1_complete_stop (skeleton,
+      invocation);
+
+  return TRUE;
+}
+
+static gboolean
 handle_trust_fingerprint_cb (GabbleGDBusChannelInterfaceOTR1 *skeleton,
     GDBusMethodInvocation *invocation,
     GVariant *fp_variant,
@@ -714,6 +730,8 @@ gabble_im_channel_otr_init (GabbleIMChannel *self)
 
   g_signal_connect (priv->skeleton, "handle-initialize",
       G_CALLBACK (handle_initialize_cb), self);
+  g_signal_connect (priv->skeleton, "handle-stop",
+      G_CALLBACK (handle_stop_cb), self);
   g_signal_connect (priv->skeleton, "handle-trust-fingerprint",
       G_CALLBACK (handle_trust_fingerprint_cb), self);
   update_properties (self);
